@@ -1,0 +1,19 @@
+{
+  "mcp": {
+    "servers": {
+      "gemini-code-assist": {
+        "command": "uv",
+        "args": [
+          "run",
+          "python",
+          "src/main.py"
+        ],
+        "cwd": "/path/to/gemini-code-assist-mcp",
+        "env": {
+          "GEMINI_DEBUG": "false",
+          "GEMINI_SANDBOX": "false"
+        }
+      }
+    }
+  }
+}

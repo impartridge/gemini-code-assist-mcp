@@ -1,6 +1,38 @@
-# Gemini MCP Server
+# Gemini Code Assist MCP
+
+[![Version](https://img.shields.io/badge/version-0.1.2-blue.svg)](https://github.com/VinnyVanGogh/gemini-code-assist-mcp/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
+[![MCP](https://img.shields.io/badge/MCP-compatible-purple.svg)](https://modelcontextprotocol.io)
 
 A robust Model Context Protocol (MCP) server that integrates Google Gemini CLI with Claude Code for AI-powered development assistance.
+
+🌟 **No API key required** - Uses your existing Google Cloud authentication  
+🚀 **Claude Code compatible** - Works seamlessly with both Claude Code and Claude Desktop  
+🔍 **Comprehensive analysis** - Code review, bug analysis, feature planning, and code explanation  
+🛠️ **CLI interface** - Test and develop with the included CLI tool
+
+## Quick Start
+
+1. **Install and authenticate Gemini CLI**:
+   ```bash
+   npm install -g @google/gemini-cli
+   gcloud auth login
+   ```
+
+2. **Clone and install the MCP server**:
+   ```bash
+   git clone https://github.com/VinnyVanGogh/gemini-code-assist-mcp.git
+   cd gemini-code-assist-mcp
+   uv sync
+   ```
+
+3. **Test the CLI**:
+   ```bash
+   uv run gemini-mcp-cli --show-prompts review file --file your_code.py
+   ```
+
+4. **Set up in Claude Code** (see [Claude Code Setup](#claude-code-setup) below)
 
 ## Features
 
@@ -76,6 +108,102 @@ Before using this MCP server, ensure you have:
    # Or with a custom name
    uv run mcp install src/main.py --name "Gemini Assistant"
    ```
+
+## Claude Code Setup
+
+### Method 1: Local MCP Server (Recommended)
+
+1. **Install the MCP server**:
+   ```bash
+   git clone https://github.com/VinnyVanGogh/gemini-code-assist-mcp.git
+   cd gemini-code-assist-mcp
+   uv sync
+   ```
+
+2. **Configure Claude Code**:
+   - Open Claude Code
+   - Navigate to Settings > MCP Servers
+   - Add a new server with these settings:
+     - **Name**: `Gemini Code Assist`
+     - **Command**: `uv`
+     - **Args**: `["run", "python", "src/main.py"]`
+     - **Working Directory**: `/path/to/gemini-code-assist-mcp`
+
+3. **Alternative: Edit configuration file**:
+   ```bash
+   # Edit your Claude Code configuration
+   code ~/.claude/settings.json
+   ```
+   
+   Add this configuration:
+   ```json
+   {
+     "mcp": {
+       "servers": {
+         "gemini-code-assist": {
+           "command": "uv",
+           "args": ["run", "python", "src/main.py"],
+           "cwd": "/path/to/gemini-code-assist-mcp",
+           "env": {
+             "GEMINI_DEBUG": "false"
+           }
+         }
+       }
+     }
+   }
+   ```
+
+### Method 2: Claude Desktop Configuration
+
+For Claude Desktop users, edit `claude_desktop_config.json`:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "gemini-code-assist": {
+      "command": "uv",
+      "args": [
+        "run",
+        "python",
+        "/path/to/gemini-code-assist-mcp/src/main.py"
+      ],
+      "env": {
+        "GEMINI_DEBUG": "false",
+        "GEMINI_SANDBOX": "false"
+      }
+    }
+  }
+}
+```
+
+### Method 3: Remote MCP Server
+
+For remote deployment, you can host the MCP server and connect via URL:
+
+```json
+{
+  "mcpServers": {
+    "gemini-code-assist": {
+      "url": "https://your-deployment-url.com/mcp",
+      "auth": {
+        "type": "bearer",
+        "token": "your-auth-token"
+      }
+    }
+  }
+}
+```
+
+### Verification
+
+After configuration, restart Claude Code/Desktop and verify the server is loaded:
+
+1. Check the MCP servers list in settings
+2. Look for "Gemini Code Assist" in available tools
+3. Try using a tool to confirm it works
 
 ## Usage in Claude Code
 
@@ -174,6 +302,77 @@ Can you show me the current Gemini configuration?
 # Claude will automatically fetch gemini://config resource
 ```
 
+## CLI Usage
+
+The included CLI tool allows you to test and use Gemini functionality directly:
+
+### Basic Commands
+
+```bash
+# Check version
+uv run gemini-mcp-cli version
+
+# Show help
+uv run gemini-mcp-cli --help
+
+# Check status and authentication
+uv run gemini-mcp-cli status check
+```
+
+### Code Review
+
+```bash
+# Review a Python file
+uv run gemini-mcp-cli review file --file code.py --focus security
+
+# Review with input/output transparency
+uv run gemini-mcp-cli --show-prompts review file --file code.py
+
+# Review from stdin
+cat code.py | uv run gemini-mcp-cli review stdin --focus performance
+
+# Output as JSON
+uv run gemini-mcp-cli --json review file --file code.py
+```
+
+### Feature Planning
+
+```bash
+# Review a feature plan
+uv run gemini-mcp-cli feature review --file feature-plan.md
+
+# Interactive feature planning
+uv run gemini-mcp-cli feature interactive
+```
+
+### Bug Analysis
+
+```bash
+# Analyze a bug with context
+uv run gemini-mcp-cli bug analyze --description "App crashes on startup" --code-file main.py
+
+# Interactive bug analysis
+uv run gemini-mcp-cli bug interactive
+```
+
+### Code Explanation
+
+```bash
+# Explain code at different levels
+uv run gemini-mcp-cli explain file --file complex.py --level beginner
+uv run gemini-mcp-cli explain file --file algorithm.py --level advanced
+```
+
+### Global Options
+
+- `--show-prompts`: Show input prompts and raw responses for transparency
+- `--json`: Output results in JSON format
+- `--verbose`: Enable verbose output
+- `--debug`: Enable debug mode
+- `--no-color`: Disable colored output
+- `--model`: Specify Gemini model (default: gemini-2.5-pro)
+- `--sandbox`: Enable sandbox mode
+
 ## Development
 
 ### Running Tests
@@ -248,36 +447,68 @@ src/
 ### Common Issues
 
 1. **"Gemini CLI not found"**
-   - Install Gemini CLI following Google's instructions
-   - Ensure `gemini` command is in your PATH
+   ```bash
+   # Install Gemini CLI
+   npm install -g @google/gemini-cli
+   
+   # Verify installation
+   which gemini
+   gemini --help
+   ```
 
 2. **Authentication errors**
-   - Run `gcloud auth login` to authenticate
-   - Verify access with `gemini --help`
+   ```bash
+   # Authenticate with Google Cloud
+   gcloud auth login
+   
+   # Test authentication
+   gemini -p "Hello world"
+   ```
 
 3. **"Command failed with exit code 1"**
-   - Check your Google authentication status
+   - Check your Google authentication status: `gcloud auth list`
    - Verify you have access to Gemini models
    - Check internet connectivity
+   - Try with `--debug` flag: `uv run gemini-mcp-cli --debug status check`
 
 4. **Tool timeouts**
    - Large code files may take time to process
    - Consider breaking down large requests
-   - Check if you've hit rate limits
+   - Check if you've hit rate limits (60 requests/minute, 1000/day)
+
+5. **MCP Server not appearing in Claude**
+   - Verify configuration file syntax with a JSON validator
+   - Check that file paths are absolute, not relative
+   - Restart Claude Code/Desktop after configuration changes
+   - Check Claude's MCP server logs for errors
+
+6. **"No such option: --show-prompts"**
+   - Make sure you're using the latest version: `uv run gemini-mcp-cli version`
+   - The option must come before the command: `--show-prompts review file` not `review file --show-prompts`
 
 ### Debug Mode
 
 Enable debug mode for detailed logging:
 
-```python
-# In src/core/config.py
-gemini_options = GeminiOptions(debug=True)
-```
-
-Or set temporarily:
 ```bash
+# CLI debug mode
+uv run gemini-mcp-cli --debug status check
+
+# Environment variable
 export GEMINI_DEBUG=true
 ```
+
+### Getting Help
+
+1. **Check the documentation** in this README
+2. **Use the CLI help**: `uv run gemini-mcp-cli --help`
+3. **Check existing issues** on GitHub
+4. **Create a new issue** with:
+   - Your operating system and Python version
+   - Complete error messages
+   - Steps to reproduce the problem
+   - Output of `uv run gemini-mcp-cli status check`
+
 
 ## Contributing
 

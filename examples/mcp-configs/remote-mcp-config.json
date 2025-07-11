@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "gemini-code-assist": {
+      "url": "https://your-deployment-url.com/mcp",
+      "auth": {
+        "type": "bearer",
+        "token": "your-auth-token"
+      },
+      "env": {
+        "GEMINI_DEBUG": "false",
+        "GEMINI_SANDBOX": "true"
+      }
+    }
+  }
+}
