@@ -15,18 +15,22 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.server.gemini_server import create_server
 
+# Expose server object at module level for MCP install command
+# The MCP install command looks for objects named 'mcp', 'app', or 'server'
+mcp = create_server()
+server = mcp  # Alias for compatibility
+app = mcp     # Alias for compatibility
+
 
 def main() -> None:
     """
     Main entry point for the Gemini MCP Server.
     
-    Starts the FastMCP server and handles the async event loop.
+    Starts the FastMCP server with stdio transport.
     """
-    server = create_server()
-
     try:
-        # Run the server with default settings
-        asyncio.run(server.run())
+        # Run the server with stdio transport (default)
+        mcp.run()
     except KeyboardInterrupt:
         print("\nShutting down Gemini MCP Server...")
     except Exception as e:

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2025-01-14
+
+### Fixed
+- **MCP Install Support**: Fixed "no server object found" error in `uv run mcp install src/main.py`
+- **Server Entry Point**: Exposed FastMCP server object at module level for proper MCP installation
+- **Direct Execution**: Fixed server.run() method call to use synchronous execution instead of asyncio
+
+### Added
+- **Manual Installation**: Added `claude mcp add` JSON command as alternative installation method
+- **Enhanced Troubleshooting**: Added MCP connection timeout and "not connected" error solutions
+- **Installation Verification**: Added steps to verify MCP server installation and connectivity
+
+### Changed
+- **Main Entry Point**: Modified `src/main.py` to expose server objects (`mcp`, `server`, `app`) at module level
+- **Documentation**: Updated README.md with working installation commands and troubleshooting
+
 ## [0.1.2] - 2025-01-14
 
 ### Added

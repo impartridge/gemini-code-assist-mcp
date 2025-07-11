@@ -1,6 +1,6 @@
 # Gemini Code Assist MCP
 
-[![Version](https://img.shields.io/badge/version-0.1.2-blue.svg)](https://github.com/VinnyVanGogh/gemini-code-assist-mcp/releases)
+[![Version](https://img.shields.io/badge/version-0.1.3-blue.svg)](https://github.com/VinnyVanGogh/gemini-code-assist-mcp/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple.svg)](https://modelcontextprotocol.io)
@@ -102,11 +102,22 @@ Before using this MCP server, ensure you have:
 
 4. **Install in Claude Code**:
    ```bash
-   # Install the server for Claude Code
+   # Install the server for Claude Code (recommended)
    uv run mcp install src/main.py
    
    # Or with a custom name
    uv run mcp install src/main.py --name "Gemini Assistant"
+   
+   # Alternative: Manual installation with JSON
+   claude mcp add '{
+     "name": "Gemini Code Assist",
+     "command": "uv",
+     "args": ["run", "python", "src/main.py"],
+     "cwd": "/Users/your-username/path/to/gemini-code-assist-mcp",
+     "env": {
+       "GEMINI_DEBUG": "false"
+     }
+   }'
    ```
 
 ## Claude Code Setup
@@ -485,6 +496,17 @@ src/
 6. **"No such option: --show-prompts"**
    - Make sure you're using the latest version: `uv run gemini-mcp-cli version`
    - The option must come before the command: `--show-prompts review file` not `review file --show-prompts`
+
+7. **MCP Server "Not connected" or timeout errors**
+   - Restart Claude Code after adding the MCP server
+   - Verify the server is running: `uv run python src/main.py` (should start without errors)
+   - Check that the working directory path is absolute and correct
+   - Verify Google authentication: `gemini -p "test"`
+   - Try removing and re-adding the MCP server configuration
+
+8. **"No server object found" during MCP install**
+   - This was fixed in v0.1.3 - make sure you're using the latest version
+   - If still occurring, try the manual installation method above
 
 ### Debug Mode
 

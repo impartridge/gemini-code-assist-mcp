@@ -115,7 +115,7 @@ def version(ctx):
     formatter = ctx.obj['formatter']
     
     version_info = {
-        "version": "0.1.1",
+        "version": "0.1.3",
         "description": "Gemini MCP Server CLI",
         "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
     }

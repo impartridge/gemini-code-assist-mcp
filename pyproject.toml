@@ -7,7 +7,7 @@ packages = ["src"]
 
 [project]
 name = "gemini-mcp-server"
-version = "0.1.2"
+version = "0.1.3"
 description = "MCP server for Google Gemini CLI integration"
 authors = [
     {name = "AI Assistant", email = "ai@example.com"}
