@@ -5,7 +5,7 @@
       "args": [
         "run",
         "python",
-        "/path/to/gemini-code-assist-mcp/src/main.py"
+        "c:\\Users\\impar\\OneDrive - Golisano Institute\\Documents\\Projects\\ClaudeCode_BTech\\gemini-code-assist-mcp\\src\\main.py"
       ],
       "env": {
         "GEMINI_DEBUG": "false",

@@ -72,13 +72,26 @@ class GeminiCLIClient:
         Raises:
             GeminiCLIError: If CLI is not available or authentication fails
         """
+        import os
+        import platform
+        
         try:
-            # Check if gemini CLI is available
-            result = await asyncio.create_subprocess_exec(
-                "which", "gemini",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
+            # Check if gemini CLI is available - handle Windows differently
+            if platform.system() == 'Windows':
+                # On Windows, try to run gemini --version directly
+                result = await asyncio.create_subprocess_shell(
+                    "gemini --version",
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                    env={**os.environ, 'GEMINI_API_KEY': os.getenv('GEMINI_API_KEY', '')}
+                )
+            else:
+                # On Unix-like systems, use which
+                result = await asyncio.create_subprocess_exec(
+                    "which", "gemini",
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE
+                )
             await result.wait()
 
             if result.returncode != 0:
@@ -141,11 +154,35 @@ class GeminiCLIClient:
         Returns:
             GeminiResponse with the result
         """
+        import os
+        import platform
+        
         # Use provided options or defaults
         opts = options or self.default_options
 
         # Build command arguments
-        cmd = ["gemini"]
+        # On Windows, use gemini.cmd for better compatibility
+        if platform.system() == 'Windows':
+            cmd = ["gemini.cmd"]
+        else:
+            cmd = ["gemini"]
+        
+        # Get environment with API key
+        env = os.environ.copy()
+        # Try to get API key from environment or .env file
+        api_key = os.getenv('GEMINI_API_KEY', '')
+        if not api_key:
+            # Try to read from .env file if it exists
+            env_file = Path(__file__).parent.parent.parent / '.env'
+            if env_file.exists():
+                with open(env_file) as f:
+                    for line in f:
+                        if line.startswith('GEMINI_API_KEY='):
+                            api_key = line.split('=', 1)[1].strip()
+                            break
+        
+        if api_key:
+            env['GEMINI_API_KEY'] = api_key
 
         # Add model selection
         cmd.extend(["-m", opts.model])
@@ -190,7 +227,8 @@ class GeminiCLIClient:
                         *cmd,
                         stdin=temp_file,
                         stdout=asyncio.subprocess.PIPE,
-                        stderr=asyncio.subprocess.PIPE
+                        stderr=asyncio.subprocess.PIPE,
+                        env=env
                     )
 
                 # Clean up temp file
@@ -200,7 +238,8 @@ class GeminiCLIClient:
                 process = await asyncio.create_subprocess_exec(
                     *cmd,
                     stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE
+                    stderr=asyncio.subprocess.PIPE,
+                    env=env
                 )
 
             # Wait for completion and get output
